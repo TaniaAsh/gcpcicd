@@ -1,0 +1,28 @@
+name: terraform-apply
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/1083264754539/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+          service_account: github-terraform@projrancher.iam.gserviceaccount.com
+
+      - run: terraform init
+        working-directory: infra
+
+      - run: terraform apply -auto-approve
+        working-directory: infra
